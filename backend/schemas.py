@@ -38,3 +38,39 @@ class BenchmarkResult(BaseModel):
 class MockAnalysisResponse(BaseModel):
     resume_json: ResumeJSON
     benchmark: BenchmarkResult
+
+
+class AnalyzeResumeRequest(BaseModel):
+    target_role: str
+    target_level: str
+
+
+class RewriteRequest(BaseModel):
+    target_role: str
+    target_level: str
+    bullet_id: str
+    original_text: str
+    weakness_reason: str
+    missing_keywords: List[str] = []
+
+
+class RewriteSuggestion(BaseModel):
+    version: int
+    rewritten_text: str
+    why_this_is_better: str
+    added_keywords: List[str] = []
+    needs_user_verification: bool = False
+
+
+class RewriteResponse(BaseModel):
+    suggestions: List[RewriteSuggestion]
+
+
+class ReevaluateRequest(BaseModel):
+    target_role: str
+    target_level: str
+    resume_json: ResumeJSON
+
+
+class ReevaluateResponse(BaseModel):
+    benchmark: BenchmarkResult
