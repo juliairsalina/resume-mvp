@@ -8,71 +8,26 @@ let appState = {
   benchmarkResult: null,
 };
 
-const mockResponse = {
-  resume_json: {
-    sections: [
-      {
-        section_id: "experience",
-        section_name: "Experience",
-        entries: [
-          {
-            entry_id: "exp1",
-            title: "Data Intern",
-            organization: "ABC Company",
-            bullets: [
-              {
-                bullet_id: "b1",
-                text: "Worked on sales data analysis."
-              },
-              {
-                bullet_id: "b2",
-                text: "Created weekly reports for the team."
-              }
-            ]
-          }
-        ]
-      },
-      {
-        section_id: "projects",
-        section_name: "Projects",
-        entries: [
-          {
-            entry_id: "proj1",
-            title: "Customer Churn Analysis",
-            organization: "University Project",
-            bullets: [
-              {
-                bullet_id: "b3",
-                text: "Built a machine learning model to predict churn."
-              }
-            ]
-          }
-        ]
-      }
-    ]
-  },
-  benchmark: {
-    overall_category: "중",
-    overall_reasoning: "The resume shows relevant work and project experience, but several bullets are too generic and lack measurable impact.",
-    weak_bullets: [
-      {
-        bullet_id: "b1",
-        reason: "Too vague and lacks tools, methods, or measurable results."
-      },
-      {
-        bullet_id: "b2",
-        reason: "Describes a task but not the outcome or value."
-      }
-    ]
+analyzeBtn.addEventListener("click", async () => {
+  try {
+    const response = await fetch("http://127.0.0.1:8000/mock-analysis");
+
+    if (!response.ok) {
+      throw new Error(`HTTP error: ${response.status}`);
+    }
+
+    const data = await response.json();
+    console.log("Fetched data:", data);
+
+    appState.resumeJson = data.resume_json;
+    appState.benchmarkResult = data.benchmark;
+
+    renderBenchmark();
+    renderEditor();
+  } catch (error) {
+    console.error("Error fetching analysis:", error);
+    summaryContent.innerHTML = `<p>Failed to load analysis: ${error.message}</p>`;
   }
-};
-
-analyzeBtn.addEventListener("click", () => {
-  appState.resumeJson = mockResponse.resume_json;
-  appState.benchmarkResult = mockResponse.benchmark;
-
-  renderBenchmark();
-  renderEditor();
 });
 
 function renderBenchmark() {
@@ -112,16 +67,22 @@ function renderEditor() {
         const isWeak = weakBulletMap.has(bullet.bullet_id);
 
         bulletEl.className = `resume-bullet ${isWeak ? "weak" : ""}`;
+        bulletEl.contentEditable = true;
         bulletEl.textContent = `• ${bullet.text}`;
 
+        bulletEl.addEventListener("input", (e) => {
+            const updatedText = e.target.textContent.replace(/^•\s*/, "").trim();
+            bullet.text = updatedText;
+        });
+
         if (isWeak) {
-          bulletEl.addEventListener("click", () => {
+            bulletEl.addEventListener("click", () => {
             showRewritePanel(bullet.text, weakBulletMap.get(bullet.bullet_id));
-          });
+            });
         }
 
         entryEl.appendChild(bulletEl);
-      });
+        });
 
       sectionEl.appendChild(entryEl);
     });
