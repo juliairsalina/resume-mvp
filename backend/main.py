@@ -16,7 +16,7 @@ app.add_middleware(
 def root():
     return {"message": "Resume MVP backend is running"}
 
-@app.get("/mock-analysis")
+@app.get("/mock-analysis", response_model=MockAnalysisResponse)
 def mock_analysis():
     return {
         "resume_json": {
