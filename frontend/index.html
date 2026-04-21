@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Resume MVP</title>
+  <link rel="stylesheet" href="./style.css" />
+</head>
+<body>
+  <div class="container">
+    <header class="page-header">
+      <h1>Resume Reeracify</h1>
+      <p>AI-assisted resume improvement</p>
+    </header>
+
+    <section class="controls">
+      <div class="field">
+        <label for="targetRole">Target Role</label>
+        <select id="targetRole">
+          <option value="">Select role</option>
+          <option value="data_analyst">Data Analyst</option>
+          <option value="backend_developer">Backend Developer</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="targetLevel">Target Level</label>
+        <select id="targetLevel">
+          <option value="">Select level</option>
+          <option value="entry_level">Entry-level</option>
+          <option value="experienced">Experienced</option>
+        </select>
+      </div>
+
+      <div class="field">
+        <label for="resumeUpload">Upload Resume PDF</label>
+        <input type="file" id="resumeUpload" accept="application/pdf" />
+      </div>
+
+      <button id="analyzeBtn">Analyze Resume</button>
+    </section>
+
+    <section class="benchmark-summary" id="benchmarkSummary">
+      <h2>Benchmark Summary</h2>
+      <div id="summaryContent">
+        <p>No analysis yet.</p>
+      </div>
+    </section>
+
+    <main class="workspace">
+      <section class="editor-panel">
+        <h2>Resume Editor</h2>
+        <div id="editorArea">
+          <p>Resume content will appear here.</p>
+        </div>
+      </section>
+
+      <aside class="rewrite-panel">
+        <h2>Rewrite Suggestions</h2>
+        <div id="rewriteContent">
+          <p>Select a highlighted bullet to see suggestions.</p>
+        </div>
+      </aside>
+    </main>
+
+    <section class="actions">
+      <button id="reevaluateBtn">Re-evaluate</button>
+      <button id="exportBtn">Export PDF</button>
+    </section>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
