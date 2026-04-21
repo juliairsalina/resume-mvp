@@ -101,3 +101,12 @@ body {
   display: flex;
   gap: 12px;
 }
+
+.resume-bullet[contenteditable="true"] {
+  outline: none;
+}
+
+.resume-bullet[contenteditable="true"]:focus {
+  border: 1px solid #4a90e2;
+  background: #f5faff;
+}
