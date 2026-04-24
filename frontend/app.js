@@ -2,6 +2,8 @@ const editorArea = document.getElementById("editorArea");
 const summaryContent = document.getElementById("summaryContent");
 const rewriteContent = document.getElementById("rewriteContent");
 const analyzeBtn = document.getElementById("analyzeBtn");
+const reevaluateBtn = document.getElementById("reevaluateBtn");
+console.log("Reevaluate button found:", reevaluateBtn);
 
 let appState = {
   resumeJson: null,
@@ -30,11 +32,17 @@ analyzeBtn.addEventListener("click", async () => {
   }
 });
 
+reevaluateBtn.addEventListener("click", () => {
+  console.log("Re-evaluate button clicked");
+  reevaluateResume();
+});
+
 function renderBenchmark() {
   const benchmark = appState.benchmarkResult;
 
   summaryContent.innerHTML = `
     <p><strong>Category:</strong> ${benchmark.overall_category}</p>
+    <p><strong>Weak bullets:</strong> ${benchmark.weak_bullets.length}</p>
     <p><strong>Reasoning:</strong> ${benchmark.overall_reasoning}</p>
   `;
 }
@@ -71,10 +79,12 @@ function renderEditor() {
         bulletEl.textContent = `• ${bullet.text}`;
 
         bulletEl.addEventListener("input", (e) => {
-            const updatedText = e.target.textContent.replace(/^•\s*/, "").trim();
-            bullet.text = updatedText;
-        });
+          const updatedText = e.target.textContent.replace(/^•\s*/, "").trim();
+          bullet.text = updatedText;
 
+          console.log("Updated bullet:", bullet.bullet_id, bullet.text);
+        });
+        
         if (isWeak) {
             bulletEl.addEventListener("click", () => {
             showRewritePanel(bullet.text, weakBulletMap.get(bullet.bullet_id));
@@ -91,13 +101,94 @@ function renderEditor() {
   });
 }
 
-function showRewritePanel(originalText, reason) {
-  rewriteContent.innerHTML = `
-    <p><strong>Selected bullet:</strong></p>
-    <p>${originalText}</p>
-    <p><strong>Why it is weak:</strong></p>
-    <p>${reason}</p>
-    <hr />
-    <p>Rewrite suggestions will appear here later.</p>
-  `;
+async function showRewritePanel(originalText, reason) {
+  rewriteContent.innerHTML = "<p>Loading suggestions...</p>";
+
+  try {
+    const response = await fetch("http://127.0.0.1:8000/rewrite", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        target_role: document.getElementById("targetRole").value,
+        target_level: document.getElementById("targetLevel").value,
+        bullet_id: "",
+        original_text: originalText,
+        weakness_reason: reason,
+        missing_keywords: []
+      })
+    });
+
+    const data = await response.json();
+
+    rewriteContent.innerHTML = `
+      <p><strong>Original:</strong></p>
+      <p>${originalText}</p>
+      <hr />
+    `;
+
+    data.suggestions.forEach(s => {
+      const block = document.createElement("div");
+
+      block.innerHTML = `
+        <p>${s.rewritten_text}</p>
+        <button>Select</button>
+        <hr />
+      `;
+
+      block.querySelector("button").addEventListener("click", () => {
+        applyRewrite(originalText, s.rewritten_text);
+      });
+
+      rewriteContent.appendChild(block);
+    });
+
+  } catch (err) {
+    rewriteContent.innerHTML = "<p>Error loading suggestions</p>";
+    console.error(err);
+  }
+}
+
+async function reevaluateResume() {
+  try {
+    console.log("Sending updated resume JSON:", appState.resumeJson);
+
+    const response = await fetch("http://127.0.0.1:8000/reevaluate", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify({
+        target_role: document.getElementById("targetRole").value,
+        target_level: document.getElementById("targetLevel").value,
+        resume_json: appState.resumeJson
+      })
+    });
+
+    const data = await response.json();
+    console.log("Re-evaluation result:", data);
+
+    appState.benchmarkResult = data.benchmark;
+
+    renderBenchmark();
+    renderEditor();
+
+  } catch (error) {
+    console.error("Re-evaluate error:", error);
+  }
+}
+
+function applyRewrite(oldText, newText) {
+  appState.resumeJson.sections.forEach(section => {
+    section.entries.forEach(entry => {
+      entry.bullets.forEach(bullet => {
+        if (bullet.text === oldText) {
+          bullet.text = newText;
+        }
+      });
+    });
+  });
+
+  renderEditor();
 }
