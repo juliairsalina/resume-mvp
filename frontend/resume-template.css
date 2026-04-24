@@ -1,0 +1,92 @@
+/* Live resume preview template */
+
+.preview-panel {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 20px;
+}
+
+#previewArea {
+  background: #e9ecef;
+  padding: 24px;
+  overflow-x: auto;
+}
+
+.resume-page {
+  width: 794px;
+  min-height: 1123px;
+  margin: 0 auto;
+  padding: 48px;
+  background: white;
+  color: #111;
+  font-family: Arial, sans-serif;
+  font-size: 13px;
+  line-height: 1.4;
+  box-shadow: 0 4px 18px rgba(0, 0, 0, 0.12);
+}
+
+.preview-section {
+  margin-bottom: 18px;
+}
+
+.preview-section h3 {
+  margin: 0 0 8px;
+  padding-bottom: 4px;
+  border-bottom: 1px solid #222;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.preview-entry {
+  margin-bottom: 12px;
+}
+
+.preview-entry strong {
+  display: block;
+  font-size: 13px;
+}
+
+.preview-entry p {
+  margin: 2px 0 4px;
+  font-size: 12px;
+}
+
+.preview-entry ul {
+  margin: 4px 0 0 18px;
+  padding: 0;
+}
+
+.preview-entry li {
+  margin-bottom: 4px;
+}
+
+/* PDF/print style */
+@media print {
+  body {
+    background: white;
+  }
+
+  .controls,
+  .benchmark-summary,
+  .workspace,
+  .actions,
+  .page-header,
+  .preview-panel h2 {
+    display: none;
+  }
+
+  #previewArea {
+    padding: 0;
+    background: white;
+  }
+
+  .resume-page {
+    width: auto;
+    min-height: auto;
+    padding: 0;
+    box-shadow: none;
+  }
+}

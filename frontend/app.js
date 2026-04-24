@@ -4,6 +4,7 @@ const rewriteContent = document.getElementById("rewriteContent");
 const analyzeBtn = document.getElementById("analyzeBtn");
 const reevaluateBtn = document.getElementById("reevaluateBtn");
 console.log("Reevaluate button found:", reevaluateBtn);
+const previewArea = document.getElementById("previewArea");
 
 let appState = {
   resumeJson: null,
@@ -83,6 +84,7 @@ function renderEditor() {
           bullet.text = updatedText;
 
           console.log("Updated bullet:", bullet.bullet_id, bullet.text);
+          renderPreview();
         });
         
         if (isWeak) {
@@ -173,6 +175,7 @@ async function reevaluateResume() {
 
     renderBenchmark();
     renderEditor();
+    renderPreview();
 
   } catch (error) {
     console.error("Re-evaluate error:", error);
@@ -191,4 +194,38 @@ function applyRewrite(oldText, newText) {
   });
 
   renderEditor();
+  renderPreview();
+
+}
+
+function renderPreview() {
+  const resumeJson = appState.resumeJson;
+
+  if (!resumeJson) {
+    previewArea.innerHTML = "<p>No resume preview yet.</p>";
+    return;
+  }
+
+  previewArea.innerHTML = `
+    <div class="resume-page">
+      ${resumeJson.sections.map(section => `
+        <section class="preview-section">
+          <h3>${section.section_name}</h3>
+
+          ${section.entries.map(entry => `
+            <div class="preview-entry">
+              <strong>${entry.title}</strong>
+              <p>${entry.organization || ""}</p>
+
+              <ul>
+                ${entry.bullets.map(bullet => `
+                  <li>${bullet.text}</li>
+                `).join("")}
+              </ul>
+            </div>
+          `).join("")}
+        </section>
+      `).join("")}
+    </div>
+  `;
 }
